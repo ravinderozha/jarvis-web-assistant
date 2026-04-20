@@ -1,68 +1,89 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jarvis Web Assistant</title>
+<title>JARVIS PRO 50 Commands</title>
 
 <style>
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:Arial, Helvetica, sans-serif;
+font-family:Arial, sans-serif;
 }
 
 body{
-background:linear-gradient(135deg,#020617,#0f172a,#111827);
-color:white;
 height:100vh;
+overflow:hidden;
+background:linear-gradient(180deg,#02111f,#04233d,#05375c,#06527f);
+color:white;
 display:flex;
 justify-content:center;
 align-items:center;
 padding:20px;
 }
 
-.container{
+/* floating bubbles */
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background:
+radial-gradient(circle at 20% 30%,rgba(255,255,255,.08),transparent 8%),
+radial-gradient(circle at 70% 40%,rgba(255,255,255,.06),transparent 7%),
+radial-gradient(circle at 40% 80%,rgba(255,255,255,.05),transparent 9%);
+animation:floatbg 12s linear infinite;
+}
+
+@keyframes floatbg{
+0%{transform:translateY(0);}
+100%{transform:translateY(-40px);}
+}
+
+.panel{
+position:relative;
+z-index:2;
 width:100%;
-max-width:700px;
-background:rgba(255,255,255,0.05);
+max-width:760px;
+background:rgba(255,255,255,.08);
 backdrop-filter:blur(14px);
-border:1px solid rgba(255,255,255,0.08);
-padding:35px;
-border-radius:22px;
+padding:28px;
+border-radius:24px;
+border:1px solid rgba(255,255,255,.12);
+box-shadow:0 0 30px rgba(0,0,0,.35);
 text-align:center;
-box-shadow:0 0 30px rgba(56,189,248,0.15);
 }
 
 h1{
 font-size:42px;
-color:#38bdf8;
-margin-bottom:10px;
+color:#67e8f9;
+letter-spacing:3px;
 }
 
 .sub{
+margin-top:8px;
 color:#cbd5e1;
-margin-bottom:30px;
-font-size:18px;
+font-size:16px;
 }
 
 #status{
-font-size:20px;
 margin:20px 0;
-color:#22c55e;
 min-height:28px;
+font-size:18px;
+color:#86efac;
 }
 
 .mic{
-width:90px;
-height:90px;
-border-radius:50%;
+width:95px;
+height:95px;
 border:none;
-background:#38bdf8;
-font-size:32px;
+border-radius:50%;
+font-size:34px;
 cursor:pointer;
-transition:0.3s;
+background:linear-gradient(135deg,#67e8f9,#38bdf8);
+box-shadow:0 0 20px rgba(56,189,248,.6);
+transition:.3s;
 }
 
 .mic:hover{
@@ -70,75 +91,84 @@ transform:scale(1.08);
 }
 
 .grid{
-margin-top:30px;
+margin-top:22px;
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-gap:15px;
+gap:12px;
 }
 
 .btn{
-padding:14px;
+padding:12px;
 border:none;
 border-radius:12px;
+background:#0f172a;
+color:#fff;
 cursor:pointer;
-background:#1e293b;
-color:white;
 font-weight:bold;
-transition:0.3s;
+transition:.3s;
 }
 
 .btn:hover{
 background:#38bdf8;
-color:black;
+color:#000;
+}
+
+.commands{
+margin-top:18px;
+height:110px;
+overflow:auto;
+padding:10px;
+border-radius:14px;
+background:rgba(255,255,255,.05);
+font-size:14px;
+color:#dbeafe;
+text-align:left;
 }
 
 .footer{
-margin-top:28px;
-font-size:14px;
-color:#94a3b8;
+margin-top:16px;
+font-size:13px;
+color:#cbd5e1;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="panel">
 
 <h1>JARVIS</h1>
-<p class="sub">Your AI Web Assistant</p>
+<div class="sub">Say: Jarvis Google / Jarvis YouTube / Jarvis Gmail...</div>
 
-<button class="mic" onclick="startListening()">🎤</button>
+<button class="mic" onclick="startJarvis()">🎤</button>
 
-<div id="status">Ready for command...</div>
+<div id="status">Ready... Say "Jarvis"</div>
 
 <div class="grid">
-
+<button class="btn" onclick="startJarvis()">Start Voice</button>
 <button class="btn" onclick="openSite('https://google.com')">Google</button>
-
 <button class="btn" onclick="openSite('https://youtube.com')">YouTube</button>
+<button class="btn" onclick="openSite('https://gmail.com')">Gmail</button>
+<button class="btn" onclick="window.open('https://chat.openai.com')">ChatGPT</button>
+</div>
 
-<button class="btn" onclick="openSite('https://chat.openai.com')">ChatGPT</button>
-
-<button class="btn" onclick="openSite('https://github.com')">GitHub</button>
-
-<button class="btn" onclick="speakTime()">Time</button>
-
-<button class="btn" onclick="darkMode()">Mode</button>
-
+<div class="commands">
+<b>50 Useful Commands:</b><br>
+google, youtube, gmail, chatgpt, github, maps, news, weather, translate, calculator,
+facebook, instagram, linkedin, x, amazon, flipkart, spotify, netflix, whatsapp web,
+drive, docs, sheets, slides, canva, reddit, wikipedia, imdb, booking, zomato,
+swiggy, ola, uber, irctc, train, flight, camera, clock, time, date, notes,
+calendar, settings, portfolio, jobs, naukri, indeed, stackoverflow, openai
 </div>
 
 <div class="footer">
-Built by Ravinder Ozha • GitHub Pages Live Project
+Works on Mobile + PC • Built by Ravinder Ozha
 </div>
 
 </div>
 
 <script>
-let dark=true;
-
-function openSite(url){
-window.open(url,'_blank');
-}
+let listening=false;
 
 function speak(text){
 let msg=new SpeechSynthesisUtterance(text);
@@ -147,78 +177,125 @@ msg.pitch=1;
 speechSynthesis.speak(msg);
 }
 
-function speakTime(){
-let now=new Date();
-let t=now.toLocaleTimeString();
-document.getElementById("status").innerText="Current time: "+t;
+function openSite(url){
+window.open(url,'_blank');
+}
+
+const commands = {
+google:"https://google.com",
+youtube:"https://youtube.com",
+gmail:"https://gmail.com",
+chatgpt:"https://chat.openai.com",
+github:"https://github.com",
+maps:"https://maps.google.com",
+news:"https://news.google.com",
+weather:"https://google.com/search?q=weather",
+translate:"https://translate.google.com",
+calculator:"https://google.com/search?q=calculator",
+facebook:"https://facebook.com",
+instagram:"https://instagram.com",
+linkedin:"https://linkedin.com",
+x:"https://x.com",
+amazon:"https://amazon.in",
+flipkart:"https://flipkart.com",
+spotify:"https://spotify.com",
+netflix:"https://netflix.com",
+whatsapp:"https://web.whatsapp.com",
+drive:"https://drive.google.com",
+docs:"https://docs.google.com",
+sheets:"https://sheets.google.com",
+slides:"https://slides.google.com",
+canva:"https://canva.com",
+reddit:"https://reddit.com",
+wikipedia:"https://wikipedia.org",
+imdb:"https://imdb.com",
+booking:"https://booking.com",
+zomato:"https://zomato.com",
+swiggy:"https://swiggy.com",
+ola:"https://olacabs.com",
+uber:"https://uber.com",
+irctc:"https://irctc.co.in",
+train:"https://google.com/search?q=train+status",
+flight:"https://google.com/search?q=flight+status",
+camera:"camera",
+clock:"clock",
+time:"time",
+date:"date",
+notes:"https://keep.google.com",
+calendar:"https://calendar.google.com",
+settings:"settings",
+portfolio:"https://ravinderozha.github.io",
+jobs:"https://linkedin.com/jobs",
+naukri:"https://naukri.com",
+indeed:"https://indeed.com",
+stackoverflow:"https://stackoverflow.com",
+openai:"https://openai.com"
+};
+
+function runCommand(text){
+
+text=text.toLowerCase();
+
+if(!text.includes("jarvis")){
+document.getElementById("status").innerText="Say Jarvis first...";
+return;
+}
+
+let cleaned=text.replace("jarvis","").trim();
+
+document.getElementById("status").innerText="You said: "+cleaned;
+
+if(cleaned==="time"){
+let t=new Date().toLocaleTimeString();
 speak("Current time is "+t);
+return;
 }
 
-function darkMode(){
-if(dark){
-document.body.style.background="linear-gradient(135deg,#f8fafc,#e2e8f0,#cbd5e1)";
-document.body.style.color="black";
-dark=false;
+if(cleaned==="date"){
+let d=new Date().toDateString();
+speak("Today is "+d);
+return;
+}
+
+if(cleaned==="camera"){
+alert("Use browser camera permission.");
+return;
+}
+
+if(commands[cleaned]){
+openSite(commands[cleaned]);
+speak("Opening "+cleaned);
 }else{
-document.body.style.background="linear-gradient(135deg,#020617,#0f172a,#111827)";
-document.body.style.color="white";
-dark=true;
+speak("Command not found");
 }
 }
 
-function startListening(){
+function startJarvis(){
 
 if(!('webkitSpeechRecognition' in window)){
-alert("Voice recognition supported in Chrome browser.");
+alert("Use Chrome browser for voice support.");
 return;
 }
 
 let recognition=new webkitSpeechRecognition();
 recognition.lang='en-US';
-recognition.start();
+recognition.continuous=true;
+recognition.interimResults=false;
 
-document.getElementById("status").innerText="Listening...";
+recognition.start();
+listening=true;
+
+document.getElementById("status").innerText="Jarvis Listening in background...";
 
 recognition.onresult=function(event){
 
-let command=event.results[0][0].transcript.toLowerCase();
-
-document.getElementById("status").innerText="You said: "+command;
-
-if(command.includes("google")){
-openSite("https://google.com");
-speak("Opening Google");
-}
-
-else if(command.includes("youtube")){
-openSite("https://youtube.com");
-speak("Opening YouTube");
-}
-
-else if(command.includes("chatgpt")){
-openSite("https://chat.openai.com");
-speak("Opening Chat GPT");
-}
-
-else if(command.includes("github")){
-openSite("https://github.com");
-speak("Opening GitHub");
-}
-
-else if(command.includes("time")){
-speakTime();
-}
-
-else{
-speak("Command not recognized");
-}
-
+let text=event.results[event.results.length-1][0].transcript;
+runCommand(text);
 };
 
 recognition.onerror=function(){
-document.getElementById("status").innerText="Voice error. Try again.";
-}
-
+document.getElementById("status").innerText="Voice error. Tap mic again.";
+};
 }
 </script>
 
