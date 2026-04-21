@@ -1,136 +1,204 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JARVIS AUTO LISTEN MODE</title>
+<title>JARVIS v1.3 Iron Man Edition</title>
 
 <style>
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:Arial,sans-serif;
+font-family:Arial,Helvetica,sans-serif;
 }
 
 body{
 height:100vh;
-background:linear-gradient(180deg,#02111f,#04233d,#05375c,#06527f);
+overflow:hidden;
+background:radial-gradient(circle at center,#07111f,#02060d 65%);
+color:#fff;
 display:flex;
 justify-content:center;
 align-items:center;
 padding:20px;
-color:white;
+}
+
+/* rotating HUD ring */
+.ring{
+position:absolute;
+width:420px;
+height:420px;
+border:2px solid rgba(56,189,248,.15);
+border-radius:50%;
+animation:spin 10s linear infinite;
+box-shadow:0 0 40px rgba(56,189,248,.08);
+}
+
+.ring::before{
+content:"";
+position:absolute;
+inset:18px;
+border:2px dashed rgba(56,189,248,.18);
+border-radius:50%;
+}
+
+@keyframes spin{
+from{transform:rotate(0deg);}
+to{transform:rotate(360deg);}
 }
 
 .panel{
+position:relative;
+z-index:5;
 width:100%;
 max-width:760px;
 padding:28px;
 border-radius:24px;
-background:rgba(255,255,255,.08);
+background:rgba(255,255,255,.05);
 backdrop-filter:blur(14px);
+border:1px solid rgba(56,189,248,.15);
 text-align:center;
-box-shadow:0 0 30px rgba(0,0,0,.35);
+box-shadow:0 0 30px rgba(56,189,248,.08);
 }
 
 h1{
-font-size:42px;
+font-size:46px;
+letter-spacing:5px;
 color:#67e8f9;
+text-shadow:0 0 15px rgba(103,232,249,.6);
 }
 
 .sub{
 margin-top:8px;
-color:#dbeafe;
+color:#cbd5e1;
+font-size:15px;
 }
 
 #status{
-margin:18px 0;
-font-size:18px;
+margin-top:18px;
+font-size:20px;
 min-height:28px;
 color:#86efac;
 }
 
 .mic{
-width:100px;
-height:100px;
+margin-top:18px;
+width:95px;
+height:95px;
 border:none;
 border-radius:50%;
-font-size:34px;
 cursor:pointer;
+font-size:34px;
 background:linear-gradient(135deg,#67e8f9,#38bdf8);
-font-weight:bold;
-transition:.3s;
+box-shadow:0 0 25px rgba(56,189,248,.55);
+transition:.25s;
 }
 
 .mic:hover{
 transform:scale(1.06);
 }
 
-.stop{
+.controls{
 margin-top:14px;
-padding:12px 18px;
-border:none;
-border-radius:12px;
-background:#ef4444;
-color:white;
-font-weight:bold;
-cursor:pointer;
+display:flex;
+gap:10px;
+justify-content:center;
+flex-wrap:wrap;
 }
 
-.commands{
+.btn{
+padding:11px 16px;
+border:none;
+border-radius:10px;
+background:#0f172a;
+color:white;
+cursor:pointer;
+font-weight:bold;
+}
+
+.btn:hover{
+background:#38bdf8;
+color:#000;
+}
+
+.log{
 margin-top:18px;
-background:rgba(255,255,255,.05);
+height:160px;
+overflow:auto;
+text-align:left;
 padding:12px;
 border-radius:14px;
+background:rgba(255,255,255,.04);
 font-size:14px;
-text-align:left;
-height:120px;
-overflow:auto;
+color:#dbeafe;
+}
+
+.log div{
+margin-bottom:6px;
+}
+
+.footer{
+margin-top:14px;
+font-size:12px;
+color:#94a3b8;
 }
 </style>
 </head>
 
 <body>
 
+<div class="ring"></div>
+
 <div class="panel">
 
 <h1>JARVIS</h1>
-<div class="sub">One Click Start • Always Listening in Background</div>
+<div class="sub">v1.3 Iron Man Edition • Voice Core Online</div>
+
+<div id="status">Standby</div>
 
 <button class="mic" onclick="toggleJarvis()">🎤</button>
 
-<div id="status">Stopped</div>
+<div class="controls">
+<button class="btn" onclick="toggleJarvis()">START / STOP</button>
+<button class="btn" onclick="speak('System online')">TEST</button>
+<button class="btn" onclick="window.open('https://github.com','_blank')">GitHub</button>
+</div>
 
-<button class="stop" onclick="toggleJarvis()">START / STOP</button>
+<div class="log" id="log"></div>
 
-<div class="commands">
-Say:<br>
-Jarvis Google<br>
-Jarvis YouTube<br>
-Jarvis Gmail<br>
-Jarvis ChatGPT<br>
-Jarvis GitHub<br>
-Jarvis Time<br>
-Jarvis Date<br>
-Jarvis Maps<br>
-Jarvis News<br>
-Jarvis Weather
+<div class="footer">
+50 Commands • Mobile + PC • Built by Ravinder Ozha
 </div>
 
 </div>
 
 <script>
-let recognition;
+let recognition=null;
 let isRunning=false;
+let restarting=false;
+
+function log(msg){
+let box=document.getElementById("log");
+box.innerHTML="<div>> "+msg+"</div>"+box.innerHTML;
+}
+
+function setStatus(txt){
+document.getElementById("status").innerText=txt;
+}
 
 function speak(text){
+speechSynthesis.cancel();
 let msg=new SpeechSynthesisUtterance(text);
+msg.rate=1;
+msg.pitch=1;
 speechSynthesis.speak(msg);
 }
 
-function openSite(url){
-window.open(url,'_blank');
+function openSite(url,name){
+window.open(url,"_blank");
+log("Opening "+name);
+speak("Opening "+name);
 }
 
 const sites={
@@ -141,90 +209,174 @@ chatgpt:"https://chat.openai.com",
 github:"https://github.com",
 maps:"https://maps.google.com",
 news:"https://news.google.com",
-weather:"https://google.com/search?q=weather"
+weather:"https://google.com/search?q=weather",
+translate:"https://translate.google.com",
+amazon:"https://amazon.in",
+flipkart:"https://flipkart.com",
+linkedin:"https://linkedin.com",
+facebook:"https://facebook.com",
+instagram:"https://instagram.com",
+reddit:"https://reddit.com",
+spotify:"https://spotify.com",
+netflix:"https://netflix.com",
+drive:"https://drive.google.com",
+docs:"https://docs.google.com",
+sheets:"https://docs.google.com/spreadsheets",
+slides:"https://docs.google.com/presentation",
+calendar:"https://calendar.google.com",
+notes:"https://keep.google.com",
+portfolio:"https://ravinderozha.github.io",
+jobs:"https://linkedin.com/jobs",
+naukri:"https://naukri.com",
+indeed:"https://indeed.com",
+stackoverflow:"https://stackoverflow.com",
+openai:"https://openai.com",
+x:"https://x.com",
+whatsapp:"https://web.whatsapp.com",
+canva:"https://canva.com",
+booking:"https://booking.com",
+zomato:"https://zomato.com",
+swiggy:"https://swiggy.com",
+uber:"https://uber.com",
+ola:"https://olacabs.com",
+irctc:"https://irctc.co.in",
+imdb:"https://imdb.com",
+wikipedia:"https://wikipedia.org",
+cricket:"https://google.com/search?q=cricket+score",
+stocks:"https://google.com/search?q=stock+market",
+gold:"https://google.com/search?q=gold+price",
+bitcoin:"https://google.com/search?q=bitcoin+price",
+flight:"https://google.com/search?q=flight+status",
+train:"https://google.com/search?q=train+status",
+camera:"camera"
 };
 
-function executeCommand(text){
+function runCommand(text){
 
-text=text.toLowerCase();
+text=text.toLowerCase().trim();
+log("Heard: "+text);
 
-if(!text.includes("jarvis")) return;
+if(!text.includes("jarvis")){
+return;
+}
 
 let cmd=text.replace("jarvis","").trim();
 
-document.getElementById("status").innerText="Heard: "+cmd;
+if(cmd===""){
+speak("Yes sir");
+return;
+}
 
 if(cmd==="time"){
-speak("Current time is " + new Date().toLocaleTimeString());
+let t=new Date().toLocaleTimeString();
+setStatus(t);
+speak("Current time is "+t);
 return;
 }
 
 if(cmd==="date"){
-speak("Today is " + new Date().toDateString());
+let d=new Date().toDateString();
+setStatus(d);
+speak("Today is "+d);
+return;
+}
+
+if(cmd==="stop"){
+toggleJarvis();
+return;
+}
+
+if(cmd==="camera"){
+speak("Camera access depends on browser permission");
 return;
 }
 
 if(sites[cmd]){
-openSite(sites[cmd]);
-speak("Opening " + cmd);
+openSite(sites[cmd],cmd);
+setStatus("Executed: "+cmd);
 }else{
+setStatus("Unknown command");
 speak("Command not found");
 }
 }
 
-function startRecognition(){
+function buildRecognition(){
 
 if(!('webkitSpeechRecognition' in window)){
-alert("Use Chrome browser");
-return;
+alert("Use Chrome browser.");
+return null;
 }
 
-recognition = new webkitSpeechRecognition();
-recognition.lang="en-US";
-recognition.continuous=true;
-recognition.interimResults=false;
+let rec=new webkitSpeechRecognition();
+rec.lang="en-US";
+rec.continuous=true;
+rec.interimResults=false;
+rec.maxAlternatives=1;
 
-recognition.onstart=function(){
-document.getElementById("status").innerText="Jarvis Running in Background...";
+rec.onstart=function(){
+setStatus("Listening...");
+log("Voice engine started");
 };
 
-recognition.onresult=function(event){
-let text=event.results[event.results.length-1][0].transcript;
-executeCommand(text);
+rec.onresult=function(event){
+let txt=event.results[event.results.length-1][0].transcript;
+runCommand(txt);
 };
 
-recognition.onerror=function(){
-document.getElementById("status").innerText="Voice error...";
+rec.onerror=function(e){
+log("Error: "+e.error);
 };
 
-recognition.onend=function(){
+rec.onend=function(){
+log("Engine ended");
 
-if(isRunning){
-recognition.start();   // Auto restart forever
-}
-};
-
+if(isRunning && !restarting){
+restarting=true;
+setTimeout(()=>{
+restarting=false;
+try{
+recognition=buildRecognition();
 recognition.start();
+}catch(err){}
+},600);
+}
+};
+
+return rec;
 }
 
-function stopRecognition(){
+function startJarvis(){
+
+if(isRunning) return;
+
+isRunning=true;
+recognition=buildRecognition();
+
+if(recognition){
+recognition.start();
+setStatus("Starting...");
+speak("Jarvis online");
+}
+}
+
+function stopJarvis(){
 
 isRunning=false;
 
 if(recognition){
-recognition.stop();
+try{recognition.stop();}catch(e){}
 }
 
-document.getElementById("status").innerText="Stopped";
+setStatus("Stopped");
+log("System stopped");
+speak("Jarvis offline");
 }
 
 function toggleJarvis(){
-
 if(isRunning){
-stopRecognition();
+stopJarvis();
 }else{
-isRunning=true;
-startRecognition();
+startJarvis();
 }
 }
 </script>
