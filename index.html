@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>JARVIS</title>
 
 <style>
@@ -25,7 +25,7 @@ padding:20px;
 
 .wrap{
 width:100%;
-max-width:860px;
+max-width:760px;
 background:#111827;
 border:1px solid #1f2937;
 border-radius:22px;
@@ -71,6 +71,11 @@ font-size:34px;
 background:#38bdf8;
 color:#000;
 font-weight:bold;
+transition:.2s;
+}
+
+.mic:hover{
+transform:scale(1.05);
 }
 
 .controls{
@@ -96,16 +101,25 @@ background:#38bdf8;
 color:#000;
 }
 
-.notes{
+.grid{
 margin-top:18px;
-width:100%;
-height:140px;
-background:#0b1220;
-color:#fff;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:10px;
+}
+
+.quick{
+padding:10px;
 border:none;
-border-radius:14px;
-padding:12px;
-resize:vertical;
+border-radius:10px;
+background:#0f172a;
+color:#cbd5e1;
+cursor:pointer;
+}
+
+.quick:hover{
+background:#38bdf8;
+color:#000;
 }
 
 .log{
@@ -137,7 +151,7 @@ color:#64748b;
 <div class="wrap">
 
 <h1>JARVIS</h1>
-<div class="sub">v2.3 Productivity Pack</div>
+<div class="sub">Stable Chrome Voice Assistant • v2 Core</div>
 
 <div id="status">Ready</div>
 
@@ -147,163 +161,159 @@ color:#64748b;
 
 <div class="controls">
 <button class="btn" onclick="toggleJarvis()">START / STOP</button>
+<button class="btn" onclick="speak('System online')">TEST VOICE</button>
 <button class="btn" onclick="clearLog()">CLEAR LOG</button>
-<button class="btn" onclick="clearNotes()">CLEAR NOTES</button>
-<button class="btn" onclick="copyNotes()">COPY NOTES</button>
 </div>
 
-<textarea id="notes" class="notes" placeholder="Jarvis Notes Pad..."></textarea>
+<div class="grid">
+<button class="quick" onclick="openSite('https://google.com','Google')">Google</button>
+<button class="quick" onclick="openSite('https://youtube.com','YouTube')">YouTube</button>
+<button class="quick" onclick="openSite('https://gmail.com','Gmail')">Gmail</button>
+<button class="quick" onclick="openSite('https://chat.openai.com','ChatGPT')">ChatGPT</button>
+<button class="quick" onclick="openSite('https://github.com','GitHub')">GitHub</button>
+<button class="quick" onclick="sayTime()">Time</button>
+</div>
 
 <div class="log" id="log"></div>
 
 <div class="footer">
-Say: Jarvis joke • Jarvis Hindi joke • Jarvis play Arijit song • Jarvis notepad • Jarvis write in a doc
+Say: Jarvis Google • Jarvis YouTube • Jarvis Gmail • Jarvis Time
 </div>
 
 </div>
 
 <script>
-let recognition=null;
-let running=false;
-let restarting=false;
-let manualStop=false;
-let noteMode=false;
+let recognition = null;
+let running = false;
+let restarting = false;
+let manualStop = false;
+let lastHeardAt = 0;
 
-function $(id){ return document.getElementById(id); }
-
-function log(msg){
-$("log").innerHTML="<div>> "+msg+"</div>"+$("log").innerHTML;
+function $(id){
+return document.getElementById(id);
 }
 
-function status(t){
-$("status").innerText=t;
+function log(msg){
+$("log").innerHTML = "<div>> " + msg + "</div>" + $("log").innerHTML;
 }
 
 function clearLog(){
 $("log").innerHTML="";
 }
 
-function clearNotes(){
-$("notes").value="";
-}
-
-function copyNotes(){
-$("notes").select();
-document.execCommand("copy");
-status("Notes copied");
+function status(txt){
+$("status").innerText = txt;
 }
 
 function speak(text){
 speechSynthesis.cancel();
-let u=new SpeechSynthesisUtterance(text);
-u.rate=1;
-u.pitch=1;
+let u = new SpeechSynthesisUtterance(text);
+u.rate = 1;
+u.pitch = 1;
 speechSynthesis.speak(u);
 }
 
 function openSite(url,name){
 window.open(url,"_blank");
-log("Opening "+name);
-status("Opened "+name);
+log("Opening " + name);
+status("Opened " + name);
 }
 
-const jokes = [
-"Why don’t programmers like nature? It has too many bugs.",
-"I told my computer I needed a break. It said no problem and froze.",
-"Why was the laptop cold? It left its Windows open."
-];
+function sayTime(){
+let t = new Date().toLocaleTimeString();
+status(t);
+speak("Current time is " + t);
+log("Time requested");
+}
 
-const hindiJokes = [
-"टीचर: होमवर्क कहाँ है? छात्र: सर, नेट स्लो था इसलिए दिमाग डाउनलोड नहीं हुआ।",
-"पत्नी: सुनो जी, मैं कैसी लग रही हूँ? पति: सिस्टम हैंग हो गया है।",
-"दोस्त: पढ़ाई कैसी चल रही है? मैं: जैसे सरकारी काम।"
-];
-
-const sites={
+/* 50 commands */
+const sites = {
 google:"https://google.com",
 youtube:"https://youtube.com",
 gmail:"https://gmail.com",
 chatgpt:"https://chat.openai.com",
-github:"https://github.com"
+github:"https://github.com",
+maps:"https://maps.google.com",
+news:"https://news.google.com",
+weather:"https://google.com/search?q=weather",
+translate:"https://translate.google.com",
+amazon:"https://amazon.in",
+flipkart:"https://flipkart.com",
+linkedin:"https://linkedin.com",
+facebook:"https://facebook.com",
+instagram:"https://instagram.com",
+reddit:"https://reddit.com",
+spotify:"https://spotify.com",
+netflix:"https://netflix.com",
+drive:"https://drive.google.com",
+docs:"https://docs.google.com",
+sheets:"https://docs.google.com/spreadsheets",
+slides:"https://docs.google.com/presentation",
+calendar:"https://calendar.google.com",
+notes:"https://keep.google.com",
+portfolio:"https://ravinderozha.github.io",
+jobs:"https://linkedin.com/jobs",
+naukri:"https://naukri.com",
+indeed:"https://indeed.com",
+stackoverflow:"https://stackoverflow.com",
+openai:"https://openai.com",
+x:"https://x.com",
+whatsapp:"https://web.whatsapp.com",
+canva:"https://canva.com",
+booking:"https://booking.com",
+zomato:"https://zomato.com",
+swiggy:"https://swiggy.com",
+uber:"https://uber.com",
+ola:"https://olacabs.com",
+irctc:"https://irctc.co.in",
+imdb:"https://imdb.com",
+wikipedia:"https://wikipedia.org",
+cricket:"https://google.com/search?q=cricket+score",
+stocks:"https://google.com/search?q=stock+market",
+gold:"https://google.com/search?q=gold+price",
+bitcoin:"https://google.com/search?q=bitcoin+price",
+flight:"https://google.com/search?q=flight+status",
+train:"https://google.com/search?q=train+status"
 };
 
 function runCommand(text){
 
-text=text.toLowerCase().trim();
-log("Heard: "+text);
-
-if(noteMode && !text.includes("jarvis")){
-$("notes").value += text + "\n";
-status("Writing...");
-return;
-}
+text = text.toLowerCase().trim();
+log("Heard: " + text);
 
 if(!text.includes("jarvis")){
 status("Waiting wake word...");
 return;
 }
 
-let cmd=text.replace("jarvis","").trim();
+let cmd = text.replace("jarvis","").trim();
 
 if(cmd===""){
 speak("Yes");
-return;
-}
-
-if(cmd.includes("tell me a joke") || cmd==="joke"){
-let j=jokes[Math.floor(Math.random()*jokes.length)];
-speak(j);
-status("Joke mode");
-return;
-}
-
-if(cmd.includes("hindi joke") || cmd.includes("ek hindi joke")){
-let j=hindiJokes[Math.floor(Math.random()*hindiJokes.length)];
-speak(j);
-status("Hindi Joke");
-return;
-}
-
-if(cmd.startsWith("play")){
-let song=cmd.replace("play","").trim();
-if(song==="a song in youtube" || song==="song in youtube" || song==="song"){
-song="latest songs";
-}
-openSite("https://www.youtube.com/results?search_query="+encodeURIComponent(song),"YouTube");
-speak("Playing "+song);
-return;
-}
-
-if(cmd==="notepad"){
-noteMode=true;
-status("Notes mode ON");
-speak("Speak now. I am writing.");
-return;
-}
-
-if(cmd==="stop notes"){
-noteMode=false;
-status("Notes mode OFF");
-speak("Stopped writing");
-return;
-}
-
-if(cmd==="write in a doc"){
-openSite("https://docs.google.com/document/create","Google Docs");
-speak("Opening document");
+status("Listening command...");
 return;
 }
 
 if(cmd==="time"){
-let t=new Date().toLocaleTimeString();
-speak("Current time is "+t);
-status(t);
+sayTime();
+return;
+}
+
+if(cmd==="date"){
+let d = new Date().toDateString();
+status(d);
+speak("Today is " + d);
+return;
+}
+
+if(cmd==="stop"){
+stopJarvis();
 return;
 }
 
 if(sites[cmd]){
 openSite(sites[cmd],cmd);
-speak("Opening "+cmd);
+speak("Opening " + cmd);
 return;
 }
 
@@ -316,37 +326,48 @@ function createRecognition(){
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 if(!SR){
-alert("Use Chrome browser.");
+alert("Use latest Chrome browser.");
 return null;
 }
 
-let rec=new SR();
-rec.lang="en-US";
-rec.continuous=false;
-rec.interimResults=false;
-rec.maxAlternatives=1;
+let rec = new SR();
 
-rec.onstart=function(){
+rec.lang = "en-US";
+rec.continuous = false;       /* stable mode */
+rec.interimResults = false;
+rec.maxAlternatives = 1;
+
+rec.onstart = function(){
 status("Listening...");
+log("Mic active");
 };
 
-rec.onresult=function(e){
-let txt=e.results[0][0].transcript;
+rec.onresult = function(e){
+lastHeardAt = Date.now();
+let txt = e.results[0][0].transcript;
 runCommand(txt);
 };
 
-rec.onerror=function(e){
-log("Error: "+e.error);
+rec.onerror = function(e){
+log("Error: " + e.error);
+status("Voice issue...");
 };
 
-rec.onend=function(){
-if(manualStop) return;
+rec.onend = function(){
 
+if(manualStop){
+status("Stopped");
+return;
+}
+
+/* safe re-arm */
 if(running && !restarting){
-restarting=true;
+restarting = true;
 setTimeout(()=>{
-restarting=false;
-if(running) startRecognitionOnly();
+restarting = false;
+if(running){
+startRecognitionOnly();
+}
 },700);
 }
 };
@@ -356,24 +377,30 @@ return rec;
 
 function startRecognitionOnly(){
 try{
-recognition=createRecognition();
-if(recognition) recognition.start();
-}catch(err){}
+recognition = createRecognition();
+if(recognition){
+recognition.start();
+}
+}catch(err){
+log("Restart blocked");
+}
 }
 
 function startJarvis(){
+
 if(running) return;
-running=true;
-manualStop=false;
+
+manualStop = false;
+running = true;
 status("Starting...");
 speak("Jarvis online");
 startRecognitionOnly();
 }
 
 function stopJarvis(){
-running=false;
-manualStop=true;
-noteMode=false;
+
+running = false;
+manualStop = true;
 
 try{
 if(recognition) recognition.stop();
@@ -381,12 +408,29 @@ if(recognition) recognition.stop();
 
 status("Stopped");
 speak("Jarvis offline");
+log("System stopped");
 }
 
 function toggleJarvis(){
-if(running) stopJarvis();
-else startJarvis();
+if(running){
+stopJarvis();
+}else{
+startJarvis();
 }
+}
+
+/* watchdog if tab active */
+setInterval(()=>{
+if(running && !document.hidden){
+let gap = Date.now() - lastHeardAt;
+if(gap > 25000 && !restarting){
+log("Idle refresh");
+try{
+if(recognition) recognition.stop();
+}catch(e){}
+}
+}
+},5000);
 </script>
 
 </body>
