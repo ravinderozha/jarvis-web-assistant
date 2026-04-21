@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JARVIS v1.3 Iron Man Edition</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>JARVIS</title>
 
 <style>
 *{
@@ -14,105 +14,84 @@ font-family:Arial,Helvetica,sans-serif;
 }
 
 body{
-height:100vh;
-overflow:hidden;
-background:radial-gradient(circle at center,#07111f,#02060d 65%);
+background:#0a0f1a;
 color:#fff;
+min-height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
 padding:20px;
 }
 
-/* rotating HUD ring */
-.ring{
-position:absolute;
-width:420px;
-height:420px;
-border:2px solid rgba(56,189,248,.15);
-border-radius:50%;
-animation:spin 10s linear infinite;
-box-shadow:0 0 40px rgba(56,189,248,.08);
-}
-
-.ring::before{
-content:"";
-position:absolute;
-inset:18px;
-border:2px dashed rgba(56,189,248,.18);
-border-radius:50%;
-}
-
-@keyframes spin{
-from{transform:rotate(0deg);}
-to{transform:rotate(360deg);}
-}
-
-.panel{
-position:relative;
-z-index:5;
+.wrap{
 width:100%;
 max-width:760px;
+background:#111827;
+border:1px solid #1f2937;
+border-radius:22px;
 padding:28px;
-border-radius:24px;
-background:rgba(255,255,255,.05);
-backdrop-filter:blur(14px);
-border:1px solid rgba(56,189,248,.15);
-text-align:center;
-box-shadow:0 0 30px rgba(56,189,248,.08);
+box-shadow:0 0 25px rgba(0,0,0,.45);
 }
 
 h1{
-font-size:46px;
-letter-spacing:5px;
-color:#67e8f9;
-text-shadow:0 0 15px rgba(103,232,249,.6);
+text-align:center;
+font-size:48px;
+letter-spacing:4px;
+color:#38bdf8;
 }
 
 .sub{
-margin-top:8px;
-color:#cbd5e1;
-font-size:15px;
+text-align:center;
+color:#94a3b8;
+margin-top:6px;
+font-size:14px;
 }
 
 #status{
 margin-top:18px;
+text-align:center;
 font-size:20px;
-min-height:28px;
 color:#86efac;
+min-height:28px;
+}
+
+.center{
+display:flex;
+justify-content:center;
+margin-top:18px;
 }
 
 .mic{
-margin-top:18px;
-width:95px;
-height:95px;
+width:96px;
+height:96px;
 border:none;
 border-radius:50%;
 cursor:pointer;
 font-size:34px;
-background:linear-gradient(135deg,#67e8f9,#38bdf8);
-box-shadow:0 0 25px rgba(56,189,248,.55);
-transition:.25s;
+background:#38bdf8;
+color:#000;
+font-weight:bold;
+transition:.2s;
 }
 
 .mic:hover{
-transform:scale(1.06);
+transform:scale(1.05);
 }
 
 .controls{
-margin-top:14px;
 display:flex;
-gap:10px;
 justify-content:center;
+gap:10px;
 flex-wrap:wrap;
+margin-top:16px;
 }
 
 .btn{
 padding:11px 16px;
 border:none;
 border-radius:10px;
-background:#0f172a;
-color:white;
+background:#1f2937;
+color:#fff;
 cursor:pointer;
 font-weight:bold;
 }
@@ -122,14 +101,34 @@ background:#38bdf8;
 color:#000;
 }
 
+.grid{
+margin-top:18px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:10px;
+}
+
+.quick{
+padding:10px;
+border:none;
+border-radius:10px;
+background:#0f172a;
+color:#cbd5e1;
+cursor:pointer;
+}
+
+.quick:hover{
+background:#38bdf8;
+color:#000;
+}
+
 .log{
 margin-top:18px;
-height:160px;
+height:180px;
 overflow:auto;
-text-align:left;
-padding:12px;
+background:#0b1220;
 border-radius:14px;
-background:rgba(255,255,255,.04);
+padding:12px;
 font-size:14px;
 color:#dbeafe;
 }
@@ -140,68 +139,95 @@ margin-bottom:6px;
 
 .footer{
 margin-top:14px;
+text-align:center;
 font-size:12px;
-color:#94a3b8;
+color:#64748b;
 }
 </style>
 </head>
 
 <body>
 
-<div class="ring"></div>
-
-<div class="panel">
+<div class="wrap">
 
 <h1>JARVIS</h1>
-<div class="sub">v1.3 Iron Man Edition • Voice Core Online</div>
+<div class="sub">Stable Chrome Voice Assistant • v2 Core</div>
 
-<div id="status">Standby</div>
+<div id="status">Ready</div>
 
+<div class="center">
 <button class="mic" onclick="toggleJarvis()">🎤</button>
+</div>
 
 <div class="controls">
 <button class="btn" onclick="toggleJarvis()">START / STOP</button>
-<button class="btn" onclick="speak('System online')">TEST</button>
-<button class="btn" onclick="window.open('https://github.com','_blank')">GitHub</button>
+<button class="btn" onclick="speak('System online')">TEST VOICE</button>
+<button class="btn" onclick="clearLog()">CLEAR LOG</button>
+</div>
+
+<div class="grid">
+<button class="quick" onclick="openSite('https://google.com','Google')">Google</button>
+<button class="quick" onclick="openSite('https://youtube.com','YouTube')">YouTube</button>
+<button class="quick" onclick="openSite('https://gmail.com','Gmail')">Gmail</button>
+<button class="quick" onclick="openSite('https://chat.openai.com','ChatGPT')">ChatGPT</button>
+<button class="quick" onclick="openSite('https://github.com','GitHub')">GitHub</button>
+<button class="quick" onclick="sayTime()">Time</button>
 </div>
 
 <div class="log" id="log"></div>
 
 <div class="footer">
-50 Commands • Mobile + PC • Built by Ravinder Ozha
+Say: Jarvis Google • Jarvis YouTube • Jarvis Gmail • Jarvis Time
 </div>
 
 </div>
 
 <script>
-let recognition=null;
-let isRunning=false;
-let restarting=false;
+let recognition = null;
+let running = false;
+let restarting = false;
+let manualStop = false;
+let lastHeardAt = 0;
 
-function log(msg){
-let box=document.getElementById("log");
-box.innerHTML="<div>> "+msg+"</div>"+box.innerHTML;
+function $(id){
+return document.getElementById(id);
 }
 
-function setStatus(txt){
-document.getElementById("status").innerText=txt;
+function log(msg){
+$("log").innerHTML = "<div>> " + msg + "</div>" + $("log").innerHTML;
+}
+
+function clearLog(){
+$("log").innerHTML="";
+}
+
+function status(txt){
+$("status").innerText = txt;
 }
 
 function speak(text){
 speechSynthesis.cancel();
-let msg=new SpeechSynthesisUtterance(text);
-msg.rate=1;
-msg.pitch=1;
-speechSynthesis.speak(msg);
+let u = new SpeechSynthesisUtterance(text);
+u.rate = 1;
+u.pitch = 1;
+speechSynthesis.speak(u);
 }
 
 function openSite(url,name){
 window.open(url,"_blank");
-log("Opening "+name);
-speak("Opening "+name);
+log("Opening " + name);
+status("Opened " + name);
 }
 
-const sites={
+function sayTime(){
+let t = new Date().toLocaleTimeString();
+status(t);
+speak("Current time is " + t);
+log("Time requested");
+}
+
+/* 50 commands */
+const sites = {
 google:"https://google.com",
 youtube:"https://youtube.com",
 gmail:"https://gmail.com",
@@ -247,138 +273,164 @@ stocks:"https://google.com/search?q=stock+market",
 gold:"https://google.com/search?q=gold+price",
 bitcoin:"https://google.com/search?q=bitcoin+price",
 flight:"https://google.com/search?q=flight+status",
-train:"https://google.com/search?q=train+status",
-camera:"camera"
+train:"https://google.com/search?q=train+status"
 };
 
 function runCommand(text){
 
-text=text.toLowerCase().trim();
-log("Heard: "+text);
+text = text.toLowerCase().trim();
+log("Heard: " + text);
 
 if(!text.includes("jarvis")){
+status("Waiting wake word...");
 return;
 }
 
-let cmd=text.replace("jarvis","").trim();
+let cmd = text.replace("jarvis","").trim();
 
 if(cmd===""){
-speak("Yes sir");
+speak("Yes");
+status("Listening command...");
 return;
 }
 
 if(cmd==="time"){
-let t=new Date().toLocaleTimeString();
-setStatus(t);
-speak("Current time is "+t);
+sayTime();
 return;
 }
 
 if(cmd==="date"){
-let d=new Date().toDateString();
-setStatus(d);
-speak("Today is "+d);
+let d = new Date().toDateString();
+status(d);
+speak("Today is " + d);
 return;
 }
 
 if(cmd==="stop"){
-toggleJarvis();
-return;
-}
-
-if(cmd==="camera"){
-speak("Camera access depends on browser permission");
+stopJarvis();
 return;
 }
 
 if(sites[cmd]){
 openSite(sites[cmd],cmd);
-setStatus("Executed: "+cmd);
-}else{
-setStatus("Unknown command");
+speak("Opening " + cmd);
+return;
+}
+
+status("Unknown command");
 speak("Command not found");
 }
-}
 
-function buildRecognition(){
+function createRecognition(){
 
-if(!('webkitSpeechRecognition' in window)){
-alert("Use Chrome browser.");
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if(!SR){
+alert("Use latest Chrome browser.");
 return null;
 }
 
-let rec=new webkitSpeechRecognition();
-rec.lang="en-US";
-rec.continuous=true;
-rec.interimResults=false;
-rec.maxAlternatives=1;
+let rec = new SR();
 
-rec.onstart=function(){
-setStatus("Listening...");
-log("Voice engine started");
+rec.lang = "en-US";
+rec.continuous = false;       /* stable mode */
+rec.interimResults = false;
+rec.maxAlternatives = 1;
+
+rec.onstart = function(){
+status("Listening...");
+log("Mic active");
 };
 
-rec.onresult=function(event){
-let txt=event.results[event.results.length-1][0].transcript;
+rec.onresult = function(e){
+lastHeardAt = Date.now();
+let txt = e.results[0][0].transcript;
 runCommand(txt);
 };
 
-rec.onerror=function(e){
-log("Error: "+e.error);
+rec.onerror = function(e){
+log("Error: " + e.error);
+status("Voice issue...");
 };
 
-rec.onend=function(){
-log("Engine ended");
+rec.onend = function(){
 
-if(isRunning && !restarting){
-restarting=true;
+if(manualStop){
+status("Stopped");
+return;
+}
+
+/* safe re-arm */
+if(running && !restarting){
+restarting = true;
 setTimeout(()=>{
-restarting=false;
-try{
-recognition=buildRecognition();
-recognition.start();
-}catch(err){}
-},600);
+restarting = false;
+if(running){
+startRecognitionOnly();
+}
+},700);
 }
 };
 
 return rec;
 }
 
-function startJarvis(){
-
-if(isRunning) return;
-
-isRunning=true;
-recognition=buildRecognition();
-
+function startRecognitionOnly(){
+try{
+recognition = createRecognition();
 if(recognition){
 recognition.start();
-setStatus("Starting...");
-speak("Jarvis online");
 }
+}catch(err){
+log("Restart blocked");
+}
+}
+
+function startJarvis(){
+
+if(running) return;
+
+manualStop = false;
+running = true;
+status("Starting...");
+speak("Jarvis online");
+startRecognitionOnly();
 }
 
 function stopJarvis(){
 
-isRunning=false;
+running = false;
+manualStop = true;
 
-if(recognition){
-try{recognition.stop();}catch(e){}
-}
+try{
+if(recognition) recognition.stop();
+}catch(err){}
 
-setStatus("Stopped");
-log("System stopped");
+status("Stopped");
 speak("Jarvis offline");
+log("System stopped");
 }
 
 function toggleJarvis(){
-if(isRunning){
+if(running){
 stopJarvis();
 }else{
 startJarvis();
 }
 }
+
+/* watchdog if tab active */
+setInterval(()=>{
+if(running && !document.hidden){
+let gap = Date.now() - lastHeardAt;
+if(gap > 25000 && !restarting){
+log("Idle refresh");
+try{
+if(recognition) recognition.stop();
+}catch(e){}
+}
+}
+},5000);
 </script>
 
 </body>
