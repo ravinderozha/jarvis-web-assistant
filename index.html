@@ -1,437 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>JARVIS</title>
-
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,Helvetica,sans-serif;
-}
-
-body{
-background:#0a0f1a;
-color:#fff;
-min-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-padding:20px;
-}
-
-.wrap{
-width:100%;
-max-width:760px;
-background:#111827;
-border:1px solid #1f2937;
-border-radius:22px;
-padding:28px;
-box-shadow:0 0 25px rgba(0,0,0,.45);
-}
-
-h1{
-text-align:center;
-font-size:48px;
-letter-spacing:4px;
-color:#38bdf8;
-}
-
-.sub{
-text-align:center;
-color:#94a3b8;
-margin-top:6px;
-font-size:14px;
-}
-
-#status{
-margin-top:18px;
-text-align:center;
-font-size:20px;
-color:#86efac;
-min-height:28px;
-}
-
-.center{
-display:flex;
-justify-content:center;
-margin-top:18px;
-}
-
-.mic{
-width:96px;
-height:96px;
-border:none;
-border-radius:50%;
-cursor:pointer;
-font-size:34px;
-background:#38bdf8;
-color:#000;
-font-weight:bold;
-transition:.2s;
-}
-
-.mic:hover{
-transform:scale(1.05);
-}
-
-.controls{
-display:flex;
-justify-content:center;
-gap:10px;
-flex-wrap:wrap;
-margin-top:16px;
-}
-
-.btn{
-padding:11px 16px;
-border:none;
-border-radius:10px;
-background:#1f2937;
-color:#fff;
-cursor:pointer;
-font-weight:bold;
-}
-
-.btn:hover{
-background:#38bdf8;
-color:#000;
-}
-
-.grid{
-margin-top:18px;
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-gap:10px;
-}
-
-.quick{
-padding:10px;
-border:none;
-border-radius:10px;
-background:#0f172a;
-color:#cbd5e1;
-cursor:pointer;
-}
-
-.quick:hover{
-background:#38bdf8;
-color:#000;
-}
-
-.log{
-margin-top:18px;
-height:180px;
-overflow:auto;
-background:#0b1220;
-border-radius:14px;
-padding:12px;
-font-size:14px;
-color:#dbeafe;
-}
-
-.log div{
-margin-bottom:6px;
-}
-
-.footer{
-margin-top:14px;
-text-align:center;
-font-size:12px;
-color:#64748b;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jarvis UI</title>
+    <style>
+        body {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: #ffff;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: background 0.3s;
+        }
+        h1 {
+            color: #38bdf8;
+        }
+        /* Add additional styles, animations, etc. */
+        .command-history {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .quick-command-tile {
+            background: rgba(255, 230, 0, 0.5);
+            color: #000;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 5px;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+        .quick-command-tile:hover {
+            transform: translateY(-2px);
+        }
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+        }
+        /* Dark mode */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: rgba(0, 0, 0, 0.9);
+                color: #ffffff;
+            }
+        }
+    </style>
 </head>
-
 <body>
-
-<div class="wrap">
-
-<h1>JARVIS</h1>
-<div class="sub">Stable Chrome Voice Assistant • v2 Core</div>
-
-<div id="status">Ready</div>
-
-<div class="center">
-<button class="mic" onclick="toggleJarvis()">🎤</button>
-</div>
-
-<div class="controls">
-<button class="btn" onclick="toggleJarvis()">START / STOP</button>
-<button class="btn" onclick="speak('System online')">TEST VOICE</button>
-<button class="btn" onclick="clearLog()">CLEAR LOG</button>
-</div>
-
-<div class="grid">
-<button class="quick" onclick="openSite('https://google.com','Google')">Google</button>
-<button class="quick" onclick="openSite('https://youtube.com','YouTube')">YouTube</button>
-<button class="quick" onclick="openSite('https://gmail.com','Gmail')">Gmail</button>
-<button class="quick" onclick="openSite('https://chat.openai.com','ChatGPT')">ChatGPT</button>
-<button class="quick" onclick="openSite('https://github.com','GitHub')">GitHub</button>
-<button class="quick" onclick="sayTime()">Time</button>
-</div>
-
-<div class="log" id="log"></div>
-
-<div class="footer">
-Say: Jarvis Google • Jarvis YouTube • Jarvis Gmail • Jarvis Time
-</div>
-
-</div>
-
-<script>
-let recognition = null;
-let running = false;
-let restarting = false;
-let manualStop = false;
-let lastHeardAt = 0;
-
-function $(id){
-return document.getElementById(id);
-}
-
-function log(msg){
-$("log").innerHTML = "<div>> " + msg + "</div>" + $("log").innerHTML;
-}
-
-function clearLog(){
-$("log").innerHTML="";
-}
-
-function status(txt){
-$("status").innerText = txt;
-}
-
-function speak(text){
-speechSynthesis.cancel();
-let u = new SpeechSynthesisUtterance(text);
-u.rate = 1;
-u.pitch = 1;
-speechSynthesis.speak(u);
-}
-
-function openSite(url,name){
-window.open(url,"_blank");
-log("Opening " + name);
-status("Opened " + name);
-}
-
-function sayTime(){
-let t = new Date().toLocaleTimeString();
-status(t);
-speak("Current time is " + t);
-log("Time requested");
-}
-
-/* 50 commands */
-const sites = {
-google:"https://google.com",
-youtube:"https://youtube.com",
-gmail:"https://gmail.com",
-chatgpt:"https://chat.openai.com",
-github:"https://github.com",
-maps:"https://maps.google.com",
-news:"https://news.google.com",
-weather:"https://google.com/search?q=weather",
-translate:"https://translate.google.com",
-amazon:"https://amazon.in",
-flipkart:"https://flipkart.com",
-linkedin:"https://linkedin.com",
-facebook:"https://facebook.com",
-instagram:"https://instagram.com",
-reddit:"https://reddit.com",
-spotify:"https://spotify.com",
-netflix:"https://netflix.com",
-drive:"https://drive.google.com",
-docs:"https://docs.google.com",
-sheets:"https://docs.google.com/spreadsheets",
-slides:"https://docs.google.com/presentation",
-calendar:"https://calendar.google.com",
-notes:"https://keep.google.com",
-portfolio:"https://ravinderozha.github.io",
-jobs:"https://linkedin.com/jobs",
-naukri:"https://naukri.com",
-indeed:"https://indeed.com",
-stackoverflow:"https://stackoverflow.com",
-openai:"https://openai.com",
-x:"https://x.com",
-whatsapp:"https://web.whatsapp.com",
-canva:"https://canva.com",
-booking:"https://booking.com",
-zomato:"https://zomato.com",
-swiggy:"https://swiggy.com",
-uber:"https://uber.com",
-ola:"https://olacabs.com",
-irctc:"https://irctc.co.in",
-imdb:"https://imdb.com",
-wikipedia:"https://wikipedia.org",
-cricket:"https://google.com/search?q=cricket+score",
-stocks:"https://google.com/search?q=stock+market",
-gold:"https://google.com/search?q=gold+price",
-bitcoin:"https://google.com/search?q=bitcoin+price",
-flight:"https://google.com/search?q=flight+status",
-train:"https://google.com/search?q=train+status"
-};
-
-function runCommand(text){
-
-text = text.toLowerCase().trim();
-log("Heard: " + text);
-
-if(!text.includes("jarvis")){
-status("Waiting wake word...");
-return;
-}
-
-let cmd = text.replace("jarvis","").trim();
-
-if(cmd===""){
-speak("Yes");
-status("Listening command...");
-return;
-}
-
-if(cmd==="time"){
-sayTime();
-return;
-}
-
-if(cmd==="date"){
-let d = new Date().toDateString();
-status(d);
-speak("Today is " + d);
-return;
-}
-
-if(cmd==="stop"){
-stopJarvis();
-return;
-}
-
-if(sites[cmd]){
-openSite(sites[cmd],cmd);
-speak("Opening " + cmd);
-return;
-}
-
-status("Unknown command");
-speak("Sorry");
-}
-
-function createRecognition(){
-
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-if(!SR){
-alert("Use latest Chrome browser.");
-return null;
-}
-
-let rec = new SR();
-
-rec.lang = "en-US";
-rec.continuous = false;       /* stable mode */
-rec.interimResults = false;
-rec.maxAlternatives = 1;
-
-rec.onstart = function(){
-status("Listening...");
-log("Mic active");
-};
-
-rec.onresult = function(e){
-lastHeardAt = Date.now();
-let txt = e.results[0][0].transcript;
-runCommand(txt);
-};
-
-rec.onerror = function(e){
-log("Error: " + e.error);
-status("Voice issue...");
-};
-
-rec.onend = function(){
-
-if(manualStop){
-status("Stopped");
-return;
-}
-
-/* safe re-arm */
-if(running && !restarting){
-restarting = true;
-setTimeout(()=>{
-restarting = false;
-if(running){
-startRecognitionOnly();
-}
-},700);
-}
-};
-
-return rec;
-}
-
-function startRecognitionOnly(){
-try{
-recognition = createRecognition();
-if(recognition){
-recognition.start();
-}
-}catch(err){
-log("Restart blocked");
-}
-}
-
-function startJarvis(){
-
-if(running) return;
-
-manualStop = false;
-running = true;
-status("Starting...");
-speak("Jarvis online");
-startRecognitionOnly();
-}
-
-function stopJarvis(){
-
-running = false;
-manualStop = true;
-
-try{
-if(recognition) recognition.stop();
-}catch(err){}
-
-status("Stopped");
-speak("Jarvis offline");
-log("System stopped");
-}
-
-function toggleJarvis(){
-if(running){
-stopJarvis();
-}else{
-startJarvis();
-}
-}
-
-/* watchdog if tab active */
-setInterval(()=>{
-if(running && !document.hidden){
-let gap = Date.now() - lastHeardAt;
-if(gap > 25000 && !restarting){
-log("Idle refresh");
-try{
-if(recognition) recognition.stop();
-}catch(e){}
-}
-}
-},5000);
-</script>
-
+    <div class="container">
+        <h1>Welcome to Jarvis</h1>
+        <p>Enhancing your experience with advanced voice commands and more!</p>
+        <div class="command-history">
+            <h2>Command History</h2>
+            <ul>
+                <li>Weather updates</li>
+                <li>News alert</li>
+                <li>Quick calculations</li>
+                <li>Set reminders</li>
+                <li>System controls</li>
+                <li>Advanced voice commands executed</li>
+            </ul>
+        </div>
+        <div class="quick-command-tile">Weather</div>
+        <div class="quick-command-tile">News</div>
+        <div class="quick-command-tile">Calculations</div>
+        <div class="quick-command-tile">Reminders</div>
+        <div class="quick-command-tile">System Control</div>
+    </div>
 </body>
 </html>
