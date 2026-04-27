@@ -1,0 +1,77 @@
+.jarvis-background {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.jarvis-header {
+    background: rgba(255, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 0, 0, 0.8);
+    border-radius: 10px;
+    color: white;
+    padding: 20px;
+    font-size: 24px;
+    text-align: center;
+}
+
+.jarvis-button {
+    background: rgba(255, 255, 0, 0.4);
+    backdrop-filter: blur(5px);
+    border: 2px solid rgba(255, 255, 0, 0.8);
+    border-radius: 5px;
+    color: black;
+    font-size: 16px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background 0.3s, border 0.3s;
+}
+
+.jarvis-button:hover {
+    background: rgba(255, 255, 0, 0.6);
+}
+
+.jarvis-card {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 15px;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.jarvis-footer {
+    background: rgba(255, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 0, 0, 0.8);
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+
+/* Additional styles */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    color: white;
+    background-color: #0D0D0D;
+}
+
+h1, h2, h3 {
+    font-weight: 300;
+}
+
+/* Neon Accent Text */
+.neon {
+    color: #00FF00;
+    text-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00;
+}
